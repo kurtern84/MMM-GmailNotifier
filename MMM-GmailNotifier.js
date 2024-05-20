@@ -3,52 +3,45 @@ Module.register("MMM-GmailNotifier", {
         clientId: "",
         clientSecret: "",
         refreshToken: "",
-        userName: "User",
-        profileImage: "path/to/default/profile/image.jpg",
+        userName: "Your Name",
+        profileImage: ""
     },
 
     start: function() {
-        this.loaded = false;
-        this.unreadEmails = 0;
+        this.emailCount = 0;
+        this.profileImage = this.config.profileImage;
         this.sendSocketNotification("CONFIG", this.config);
-    },
-
-    getStyles: function() {
-        return ["MMM-GmailNotifier.css"];
     },
 
     getDom: function() {
         var wrapper = document.createElement("div");
-        var profileWrapper = document.createElement("div");
-        var emailWrapper = document.createElement("div");
-
-        var profileImage = document.createElement("img");
-        profileImage.src = this.config.profileImage;
-        profileImage.className = "profile-image";
         
-        var profileName = document.createElement("div");
-        profileName.innerHTML = this.config.userName;
-        profileName.className = "profile-name";
-
-        profileWrapper.appendChild(profileImage);
-        profileWrapper.appendChild(profileName);
-
-        emailWrapper.className = "email-status";
-        if (this.unreadEmails > 0) {
-            emailWrapper.innerHTML = `Du har ${this.unreadEmails} ulest epost(er).`;
-        } else {
-            emailWrapper.style.display = "none";
+        if (this.profileImage) {
+            var imageElement = document.createElement("img");
+            imageElement.src = this.profileImage;
+            imageElement.style.borderRadius = "50%";
+            imageElement.style.width = "100px"; // Adjust size as needed
+            wrapper.appendChild(imageElement);
         }
+        
+        var nameElement = document.createElement("div");
+        nameElement.innerHTML = this.config.userName;
+        wrapper.appendChild(nameElement);
 
-        wrapper.appendChild(profileWrapper);
-        wrapper.appendChild(emailWrapper);
+        var emailCountElement = document.createElement("div");
+        emailCountElement.innerHTML = this.emailCount > 0 ? "You have " + this.emailCount + " unread emails" : "";
+        wrapper.appendChild(emailCountElement);
 
         return wrapper;
     },
 
     socketNotificationReceived: function(notification, payload) {
         if (notification === "EMAIL_COUNT") {
-            this.unreadEmails = payload;
+            this.emailCount = payload;
+            this.updateDom();
+        }
+        if (notification === "PROFILE_IMAGE") {
+            this.profileImage = payload;
             this.updateDom();
         }
     }

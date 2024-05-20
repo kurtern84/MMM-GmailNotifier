@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
 
-const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
+const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly', 'https://www.googleapis.com/auth/userinfo.profile'];
 const TOKEN_PATH = path.join(__dirname, 'token.json');
 
 module.exports = NodeHelper.create({
@@ -35,6 +35,7 @@ module.exports = NodeHelper.create({
             if (err) return this.getNewToken(oAuth2Client);
             oAuth2Client.setCredentials(JSON.parse(token));
             this.checkGmail(oAuth2Client);
+            this.getProfileImage(oAuth2Client);
         });
     },
 
@@ -60,6 +61,7 @@ module.exports = NodeHelper.create({
                 fs.writeFileSync(TOKEN_PATH, JSON.stringify(token));
                 console.log('Token stored to', TOKEN_PATH);
                 this.checkGmail(oAuth2Client);
+                this.getProfileImage(oAuth2Client);
             });
         });
     },
@@ -78,6 +80,18 @@ module.exports = NodeHelper.create({
             setTimeout(() => {
                 this.checkGmail(auth);
             }, 60000); // check every minute
+        });
+    },
+
+    getProfileImage: function(auth) {
+        const people = google.people({ version: 'v1', auth });
+        people.people.get({
+            resourceName: 'people/me',
+            personFields: 'photos'
+        }, (err, res) => {
+            if (err) return console.log('The API returned an error: ' + err);
+            const profileImage = res.data.photos && res.data.photos.length > 0 ? res.data.photos[0].url : null;
+            this.sendSocketNotification("PROFILE_IMAGE", profileImage);
         });
     }
 });
