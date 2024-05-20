@@ -1,0 +1,16 @@
+.profile-image {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+}
+
+.profile-name {
+    font-size: 24px;
+    margin-top: 10px;
+}
+
+.email-status {
+    font-size: 16px;
+    color: white;
+    margin-top: 10px;
+}
