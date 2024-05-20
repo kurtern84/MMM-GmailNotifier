@@ -1,5 +1,5 @@
 # MMM-GmailNotifier
-MMM-GmailNotifier is a MagicMirror module that displays the user's Gmail profile picture and name, and checks for unread emails in the inbox. The profile picture is automatically shown if there are any unread emails.
+MMM-GmailNotifier is a MagicMirror module that displays the user's Gmail profile picture and name, and checks for unread emails in the inbox.
 ```
 Features
    - Displays the profile name and profile picture from the Gmail account.
