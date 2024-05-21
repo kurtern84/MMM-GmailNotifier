@@ -20,7 +20,7 @@ Follow these steps to install and configure MMM-GmailNotifier:
 ### 1. Clone the Repository
 ```
 cd ~/MagicMirror/modules
-git clone https://github.com/yourusername/MMM-GmailNotifier.git
+git clone https://github.com/kurtern84/MMM-GmailNotifier.git
 cd MMM-GmailNotifier
 ```
 
