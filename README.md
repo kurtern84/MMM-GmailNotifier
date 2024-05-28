@@ -79,11 +79,37 @@ git pull
 npm install
 ```
 ### Troubleshooting
-If you encounter any issues, check the MagicMirror logs for error messages:
+If you encounter issues while using `MMM-GmailNotifier`, follow these steps to diagnose and resolve common problems:
+
+1. `invalid_grant` Error
+- This error can occur for several reasons, including expired or revoked tokens, issues with OAuth2 configuration, or problems with the authorization code. Try the following steps to resolve it:
+   
+1.1 Delete `token.json` File
+- Delete the `token.json` file in the `MMM-GmailNotifier` directory. This will force the application to generate a new authorization token on the next start.
+```
+cd ~/MagicMirror/modules/MMM-GmailNotifier
+rm token.json
+```
+3. Check OAuth Configuration
+- Ensure that your `client_id` and `client_secret` are correct and up-to-date in `config.js`.
+- If you have regenerated the client secret, update `config.js` with the new values.
+
+3. Reauthorize the Application
+- Restart MagicMirror and follow the authorization process again to obtain a new authorization token.
+```
+npm start
+```
+- Follow the instructions in the console, visit the provided URL, and paste the authorization code.
+
+### Logging
+To further diagnose issues, check the MagicMirror logs for error messages:
 ```
 pm2 logs mm
 ```
 For more details or questions, you can open an issue on the GitHub repository.
+
+
+
 
 ### License
 This project is licensed under the MIT License. See the LICENSE file for details.
