@@ -32,8 +32,24 @@ module.exports = NodeHelper.create({
         const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 
         fs.readFile(TOKEN_PATH, (err, token) => {
-            if (err) return this.getNewToken(oAuth2Client);
-            oAuth2Client.setCredentials(JSON.parse(token));
+            if (err) {
+                console.log("Token not found, requesting a new one.");
+                return this.getNewToken(oAuth2Client);
+            }
+
+            const parsedToken = JSON.parse(token);
+            oAuth2Client.setCredentials(parsedToken);
+
+            // Automate token refresh
+            oAuth2Client.on('tokens', (newTokens) => {
+                if (newTokens.refresh_token) {
+                    // Save the updated refresh token to disk
+                    parsedToken.refresh_token = newTokens.refresh_token;
+                    fs.writeFileSync(TOKEN_PATH, JSON.stringify(parsedToken));
+                    console.log('Refresh token updated and stored.');
+                }
+            });
+
             this.checkGmail(oAuth2Client);
             this.getProfileImage(oAuth2Client);
         });
@@ -60,6 +76,17 @@ module.exports = NodeHelper.create({
                 oAuth2Client.setCredentials(token);
                 fs.writeFileSync(TOKEN_PATH, JSON.stringify(token));
                 console.log('Token stored to', TOKEN_PATH);
+
+                // Automate token refresh
+                oAuth2Client.on('tokens', (newTokens) => {
+                    if (newTokens.refresh_token) {
+                        // Save the updated refresh token to disk
+                        token.refresh_token = newTokens.refresh_token;
+                        fs.writeFileSync(TOKEN_PATH, JSON.stringify(token));
+                        console.log('Refresh token updated and stored.');
+                    }
+                });
+
                 this.checkGmail(oAuth2Client);
                 this.getProfileImage(oAuth2Client);
             });
