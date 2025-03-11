@@ -37,17 +37,18 @@ module.exports = NodeHelper.create({
                 return this.getNewToken(oAuth2Client);
             }
 
-            const parsedToken = JSON.parse(token);
+            let parsedToken = JSON.parse(token);
             oAuth2Client.setCredentials(parsedToken);
 
-            // Automate token refresh
             oAuth2Client.on('tokens', (newTokens) => {
-                if (newTokens.refresh_token) {
-                    // Save the updated refresh token to disk
-                    parsedToken.refresh_token = newTokens.refresh_token;
-                    fs.writeFileSync(TOKEN_PATH, JSON.stringify(parsedToken));
-                    console.log('Refresh token updated and stored.');
+                if (newTokens.access_token) {
+                    parsedToken.access_token = newTokens.access_token;
                 }
+                if (newTokens.refresh_token) {
+                    parsedToken.refresh_token = newTokens.refresh_token;
+                }
+                fs.writeFileSync(TOKEN_PATH, JSON.stringify(parsedToken, null, 2));
+                console.log('Access token refreshed and saved to disk.');
             });
 
             this.checkGmail(oAuth2Client);
@@ -58,9 +59,10 @@ module.exports = NodeHelper.create({
     getNewToken: function(oAuth2Client) {
         const authUrl = oAuth2Client.generateAuthUrl({
             access_type: 'offline',
+            prompt: 'consent',
             scope: SCOPES,
         });
-        console.log('Authorize this app by visiting this url:', authUrl);
+        console.log('Authorize this app by visiting this URL:', authUrl);
 
         const rl = readline.createInterface({
             input: process.stdin,
@@ -73,18 +75,23 @@ module.exports = NodeHelper.create({
                     console.error('Error retrieving access token', err);
                     return;
                 }
-                oAuth2Client.setCredentials(token);
-                fs.writeFileSync(TOKEN_PATH, JSON.stringify(token));
+                if (!token.refresh_token) {
+                    console.warn('No refresh token received. Make sure you use "access_type: offline" and grant full consent.');
+                }
+                fs.writeFileSync(TOKEN_PATH, JSON.stringify(token, null, 2));
                 console.log('Token stored to', TOKEN_PATH);
 
-                // Automate token refresh
+                oAuth2Client.setCredentials(token);
+
                 oAuth2Client.on('tokens', (newTokens) => {
-                    if (newTokens.refresh_token) {
-                        // Save the updated refresh token to disk
-                        token.refresh_token = newTokens.refresh_token;
-                        fs.writeFileSync(TOKEN_PATH, JSON.stringify(token));
-                        console.log('Refresh token updated and stored.');
+                    if (newTokens.access_token) {
+                        token.access_token = newTokens.access_token;
                     }
+                    if (newTokens.refresh_token) {
+                        token.refresh_token = newTokens.refresh_token;
+                    }
+                    fs.writeFileSync(TOKEN_PATH, JSON.stringify(token, null, 2));
+                    console.log('Token updated and stored.');
                 });
 
                 this.checkGmail(oAuth2Client);
@@ -106,7 +113,7 @@ module.exports = NodeHelper.create({
             this.sendSocketNotification("EMAIL_COUNT", unreadCount);
             setTimeout(() => {
                 this.checkGmail(auth);
-            }, 60000); // check every minute
+            }, 60000);
         });
     },
 
