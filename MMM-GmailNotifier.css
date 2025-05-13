@@ -1,16 +1,33 @@
 .profile-image {
-    border-radius: 50%;
-    width: 100px;
-    height: 100px;
+    width: 80px !important;
+    height: 80px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    overflow: hidden !important;
+    border: 0px solid #fff !important;
+    display: block !important;
+    background-color: transparent !important;
+    margin-left: auto !important; /* 👈 Flytter bildet helt til høyre */
 }
 
 .profile-name {
-    font-size: 24px;
-    margin-top: 10px;
+    font-size: 20px !important; /* Litt mindre for bedre proporsjoner */
+    margin-top: 10px !important;
+    font-weight: bold !important; /* Gjør navnet mer fremtredende */
+    color: #f0f0f0 !important; /* Lys grå for bedre lesbarhet */
 }
 
 .email-status {
-    font-size: 16px;
-    color: white;
-    margin-top: 10px;
+    font-size: 18px !important; /* Litt større for synlighet */
+    color: #ffcc00 !important; /* Gult for å trekke oppmerksomhet til e-poststatus */
+    margin-top: 10px !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5) !important; /* Litt skygge for mer kontrast */
+}
+
+.email-error {
+    color: #ff5555;
+    font-weight: bold;
+    padding: 10px;
+    text-align: center;
 }
